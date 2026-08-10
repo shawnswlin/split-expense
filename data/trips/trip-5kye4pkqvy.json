@@ -1,0 +1,83 @@
+{
+  "tripId": "trip-5kye4pkqvy",
+  "name": "2026 騎輪節",
+  "createdAt": "2026-08-10T03:25:43.609Z",
+  "extraParticipants": [],
+  "expenses": [
+    {
+      "id": "exp-6hckkj02zm",
+      "payerId": "chenghuan",
+      "totalAmount": 12430,
+      "splitType": "equal",
+      "shares": [
+        {
+          "participantId": "chenghuan",
+          "amount": 2071.65
+        },
+        {
+          "participantId": "zhaojun",
+          "amount": 2071.67
+        },
+        {
+          "participantId": "zhanxian",
+          "amount": 2071.67
+        },
+        {
+          "participantId": "yanzhi",
+          "amount": 2071.67
+        },
+        {
+          "participantId": "huanyu",
+          "amount": 2071.67
+        },
+        {
+          "participantId": "shiwei",
+          "amount": 2071.67
+        }
+      ],
+      "createdAt": "2026-08-10T03:26:24.596Z"
+    },
+    {
+      "id": "exp-hxral6ek1x",
+      "payerId": "shiwei",
+      "totalAmount": 1000,
+      "splitType": "equal",
+      "shares": [
+        {
+          "participantId": "chenghuan",
+          "amount": 142.84
+        },
+        {
+          "participantId": "zhaojun",
+          "amount": 142.86
+        },
+        {
+          "participantId": "zhanxian",
+          "amount": 142.86
+        },
+        {
+          "participantId": "yanzhi",
+          "amount": 142.86
+        },
+        {
+          "participantId": "huanyu",
+          "amount": 142.86
+        },
+        {
+          "participantId": "shiwei",
+          "amount": 142.86
+        },
+        {
+          "participantId": "bolun",
+          "amount": 142.86
+        }
+      ],
+      "createdAt": "2026-08-10T03:35:19.078Z"
+    }
+  ],
+  "settlementPaid": {
+    "shiwei->chenghuan": true,
+    "zhanxian->chenghuan": true,
+    "yanzhi->chenghuan": true
+  }
+}

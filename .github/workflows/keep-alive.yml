@@ -1,0 +1,23 @@
+name: Keep Supabase project awake
+
+# Supabase free-tier projects auto-pause after 7 days with no activity.
+# Curling the static GitHub Pages site wouldn't count — the page's JS
+# (which is what actually queries Supabase) never runs under curl. This
+# hits the Supabase REST API directly instead, weekly, well under the
+# 7-day window.
+on:
+  schedule:
+    - cron: "0 3 * * 1" # every Monday 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Supabase
+        run: |
+          curl -sf "https://qsqpbquukieulmtocckd.supabase.co/rest/v1/trips?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}"
+        env:
+          SUPABASE_ANON_KEY: sb_publishable_SY2Egl0sTNoZLgVNG0mPtA_LJs5JXbY
