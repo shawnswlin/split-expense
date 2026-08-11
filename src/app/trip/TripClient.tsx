@@ -21,6 +21,10 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
+function fmt(n: number): string {
+  return Math.round(n).toLocaleString();
+}
+
 export default function TripClient() {
   const searchParams = useSearchParams();
   const tripId = searchParams.get("id") ?? "";
@@ -117,7 +121,7 @@ export default function TripClient() {
 
   function addExpense(expense: Expense) {
     const label = expense.title ? `${expense.title}（${nameOf(expense.payerId)}付）` : nameOf(expense.payerId);
-    runAction(() => addExpenseRequest(tripId, expense), `新增帳目：${label} $${expense.totalAmount}`);
+    runAction(() => addExpenseRequest(tripId, expense), `新增帳目：${label} $${fmt(expense.totalAmount)}`);
   }
 
   function deleteExpense(expenseId: string) {
@@ -187,7 +191,7 @@ export default function TripClient() {
               <div className="expense-item" key={expense.id}>
                 <div className="row">
                   <strong>{expense.title ? `${expense.title}（${nameOf(expense.payerId)}）` : nameOf(expense.payerId)}</strong>
-                  <span>${expense.totalAmount}</span>
+                  <span>${fmt(expense.totalAmount)}</span>
                   <button
                     disabled={saving}
                     onClick={() => {
@@ -201,7 +205,7 @@ export default function TripClient() {
                 {debts.map((debt) => (
                   <div className="row" key={debt.participantId} style={{ marginTop: 6 }}>
                     <span style={{ textDecoration: debt.paid ? "line-through" : "none" }}>
-                      {nameOf(debt.participantId)} 要付 ${debt.amount} 給 {nameOf(expense.payerId)}
+                      {nameOf(debt.participantId)} 要付 ${fmt(debt.amount)} 給 {nameOf(expense.payerId)}
                     </span>
                     <label style={{ margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
                       <input
@@ -231,7 +235,7 @@ export default function TripClient() {
                 onClick={() => toggleSummaryExpanded(p.id)}
               >
                 <span>{expanded ? "▾" : "▸"} {p.name}</span>
-                <span>花費 ${p.spent}</span>
+                <span>花費 ${fmt(p.spent)}</span>
               </div>
               {expanded && (
                 <div style={{ padding: "0 16px 8px" }}>
@@ -239,7 +243,7 @@ export default function TripClient() {
                   {p.items.map((item, i) => (
                     <div className="row" key={`${item.expenseId}-${i}`} style={{ marginTop: 4 }}>
                       <span className="muted">{item.title}</span>
-                      <span>${item.amount}</span>
+                      <span>${fmt(item.amount)}</span>
                     </div>
                   ))}
                 </div>
@@ -347,7 +351,7 @@ function AddExpenseForm({
       }));
       const sum = round2(shares.reduce((s, share) => s + share.amount, 0));
       if (Math.abs(sum - total) > 0.01) {
-        setFormError(`自訂金額加總（$${sum}）跟總金額（$${total}）不一致`);
+        setFormError(`自訂金額加總（$${fmt(sum)}）跟總金額（$${fmt(total)}）不一致`);
         return;
       }
     }
