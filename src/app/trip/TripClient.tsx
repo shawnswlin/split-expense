@@ -58,18 +58,36 @@ export default function TripClient() {
 
   const nameOf = (id: string) => participants.find((p) => p.id === id)?.name ?? id;
 
+  const [expandedSummaryIds, setExpandedSummaryIds] = useState<Set<string>>(new Set());
+
+  function toggleSummaryExpanded(participantId: string) {
+    setExpandedSummaryIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(participantId)) next.delete(participantId);
+      else next.add(participantId);
+      return next;
+    });
+  }
+
+  type SpendingItem = { expenseId: string; title: string; amount: number };
+
   const spendingSummary = useMemo(() => {
-    const totals = new Map<string, { spent: number; paid: number }>();
-    for (const p of participants) totals.set(p.id, { spent: 0, paid: 0 });
+    const totals = new Map<string, { spent: number; items: SpendingItem[] }>();
+    for (const p of participants) totals.set(p.id, { spent: 0, items: [] });
     for (const expense of trip?.expenses ?? []) {
-      const payerTotals = totals.get(expense.payerId);
-      if (payerTotals) payerTotals.paid = round2(payerTotals.paid + expense.totalAmount);
       for (const share of expense.shares) {
         const shareTotals = totals.get(share.participantId);
-        if (shareTotals) shareTotals.spent = round2(shareTotals.spent + share.amount);
+        if (!shareTotals) continue;
+        shareTotals.spent = round2(shareTotals.spent + share.amount);
+        shareTotals.items.push({
+          expenseId: expense.id,
+          title: expense.title || nameOf(expense.payerId),
+          amount: share.amount,
+        });
       }
     }
-    return participants.map((p) => ({ id: p.id, name: p.name, ...(totals.get(p.id) ?? { spent: 0, paid: 0 }) }));
+    return participants.map((p) => ({ id: p.id, name: p.name, ...(totals.get(p.id) ?? { spent: 0, items: [] }) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [participants, trip?.expenses]);
 
   async function runAction(action: () => Promise<void>, logMessage?: string) {
@@ -214,15 +232,32 @@ export default function TripClient() {
 
       <h2>花費總覽</h2>
       <div className="card">
-        {spendingSummary.map((p) => (
-          <div className="expense-item row" key={p.id}>
-            <span>{p.name}</span>
-            <span>
-              花費 ${p.spent}
-              {p.paid > 0 && <span className="muted">（代墊 ${p.paid}）</span>}
-            </span>
-          </div>
-        ))}
+        {spendingSummary.map((p) => {
+          const expanded = expandedSummaryIds.has(p.id);
+          return (
+            <div key={p.id}>
+              <div
+                className="expense-item row"
+                style={{ cursor: "pointer" }}
+                onClick={() => toggleSummaryExpanded(p.id)}
+              >
+                <span>{expanded ? "▾" : "▸"} {p.name}</span>
+                <span>花費 ${p.spent}</span>
+              </div>
+              {expanded && (
+                <div style={{ padding: "0 16px 8px" }}>
+                  {p.items.length === 0 && <p className="muted">沒有分攤到任何帳目</p>}
+                  {p.items.map((item, i) => (
+                    <div className="row" key={`${item.expenseId}-${i}`} style={{ marginTop: 4 }}>
+                      <span className="muted">{item.title}</span>
+                      <span>${item.amount}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </main>
   );
