@@ -58,6 +58,20 @@ export default function TripClient() {
 
   const nameOf = (id: string) => participants.find((p) => p.id === id)?.name ?? id;
 
+  const spendingSummary = useMemo(() => {
+    const totals = new Map<string, { spent: number; paid: number }>();
+    for (const p of participants) totals.set(p.id, { spent: 0, paid: 0 });
+    for (const expense of trip?.expenses ?? []) {
+      const payerTotals = totals.get(expense.payerId);
+      if (payerTotals) payerTotals.paid = round2(payerTotals.paid + expense.totalAmount);
+      for (const share of expense.shares) {
+        const shareTotals = totals.get(share.participantId);
+        if (shareTotals) shareTotals.spent = round2(shareTotals.spent + share.amount);
+      }
+    }
+    return participants.map((p) => ({ id: p.id, name: p.name, ...(totals.get(p.id) ?? { spent: 0, paid: 0 }) }));
+  }, [participants, trip?.expenses]);
+
   async function runAction(action: () => Promise<void>, logMessage?: string) {
     setActionError(null);
     setSaving(true);
@@ -194,6 +208,19 @@ export default function TripClient() {
           <div className="expense-item row" key={entry.id}>
             <span>{entry.message}</span>
             <span className="muted">{formatTime(entry.createdAt)}</span>
+          </div>
+        ))}
+      </div>
+
+      <h2>花費總覽</h2>
+      <div className="card">
+        {spendingSummary.map((p) => (
+          <div className="expense-item row" key={p.id}>
+            <span>{p.name}</span>
+            <span>
+              花費 ${p.spent}
+              {p.paid > 0 && <span className="muted">（代墊 ${p.paid}）</span>}
+            </span>
           </div>
         ))}
       </div>
