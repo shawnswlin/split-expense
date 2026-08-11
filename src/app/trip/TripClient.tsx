@@ -219,17 +219,6 @@ export default function TripClient() {
           })}
       </div>
 
-      <h2>更動紀錄</h2>
-      <div className="card">
-        {trip.activityLog.length === 0 && <p className="muted">還沒有任何紀錄</p>}
-        {trip.activityLog.map((entry) => (
-          <div className="expense-item row" key={entry.id}>
-            <span>{entry.message}</span>
-            <span className="muted">{formatTime(entry.createdAt)}</span>
-          </div>
-        ))}
-      </div>
-
       <h2>花費總覽</h2>
       <div className="card">
         {spendingSummary.map((p) => {
@@ -258,6 +247,17 @@ export default function TripClient() {
             </div>
           );
         })}
+      </div>
+
+      <h2>更動紀錄</h2>
+      <div className="card">
+        {trip.activityLog.length === 0 && <p className="muted">還沒有任何紀錄</p>}
+        {trip.activityLog.map((entry) => (
+          <div className="expense-item row" key={entry.id}>
+            <span>{entry.message}</span>
+            <span className="muted">{formatTime(entry.createdAt)}</span>
+          </div>
+        ))}
       </div>
     </main>
   );
